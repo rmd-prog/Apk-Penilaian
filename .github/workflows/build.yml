@@ -18,23 +18,30 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Install Dependencies & Auto Accept SDK Licenses
+    - name: Install System Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential ccache git libffi-dev libssl-dev python3-dev libsqlite3-dev zlib1g-dev openjdk-17-jdk zip unzip
         pip install --upgrade pip setuptools
         pip install "cython<3.0.0" buildozer
-        
-        # Buat folder lisensi Android dan setujui semua lisensi di awal
+
+    - name: Pre-accept Android SDK Licenses
+      run: |
         mkdir -p ~/.android
         touch ~/.android/repositories.cfg
-        yes | buildozer android pdm || true
+        mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+        echo -e "\n8933373015501438a109655336099223b1a85571\nd56f5187479451eabf01fb78af6dfcb131a6481e\n24333f8a63718c303a6b28e0e4eb14d21f323d6a" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+        echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
 
     - name: Build APK
       run: |
-        # Setujui lisensi SDK secara otomatis lewat pipeline
-        yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
-        buildozer -v android debug
+        buildozer android debug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: Aplikasi-Penilaian-APK
+        path: bin/*.apk        buildozer -v android debug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
