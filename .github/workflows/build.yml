@@ -10,24 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Build with Buildozer
+      uses: ArtemSydoryk/buildozer-action@v1
       with:
-        python-version: '3.10'
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential ccache git libffi-dev libssl-dev python3-dev libsqlite3-dev zlib1g-dev openjdk-17-jdk zip unzip ffmpeg libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good
-        pip install --upgrade pip
-        pip install "cython<3.0.0" buildozer autopep8
-
-    - name: Build APK with Buildozer
-      run: |
-        buildozer -v android debug
+        command: buildozer -v android debug
+        repository_root: .
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
