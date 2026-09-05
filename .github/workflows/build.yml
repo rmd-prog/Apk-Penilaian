@@ -10,14 +10,24 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - name: Checkout Repository
+    - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Build APK with Buildozer Action
-      uses: Joshour/action-buildozer@v1.2
+    - name: Set up Python
+      uses: actions/setup-python@v5
       with:
-        command: buildozer -v android debug
-        buildozer_version: master
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential ccache git libffi-dev libssl-dev python3-dev libsqlite3-dev zlib1g-dev openjdk-17-jdk zip unzip
+        pip install --upgrade pip
+        pip install "cython<3.0.0" buildozer
+
+    - name: Build APK
+      run: |
+        buildozer -v android debug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
